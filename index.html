@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monta Pelada</title>
+    <link rel="icon" href="img/jogador-de-futebol.png" type="image/x-icon">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div style="display: flex; gap: 10px; justify-content: space-between; align-items: center;">
+        <h1>
+            Escale seu time
+            <br>
+            da pelada
+            <img src="img/sports_and_outdoors_48dp_000000_FILL0_wght400_GRAD0_opsz48.png" alt="bola de futebol"
+                style="width: 24px; height: 24px;">
+        </h1>
+
+        <!-- Detalhes e configurações -->
+        <div class="configs">
+            <div>
+                <label for="jogadores">Limite de jogadores:</label>
+                <input type="number" id="limite-jogadores" name="jogadores" min="1" max="11">
+            </div>
+            <div style="display: flex; gap: 5px; align-items: center;">
+                <p style="display: flex; align-items: center;"><img style="width: 24px; height: 24px;"
+                        src="img/jogador-de-futebol.png">Total jogadores escalados:</p>
+                <span id="total-jogadores"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="main">
+
+        <div class="main-show">
+            <button class="troca-time">Trocar Time</button>
+            <div id="campo">
+                <div class="circulo-central"></div>
+                <div class="linha-centro"></div>
+                <div class="area-gol esquerda"></div>
+                <div class="area-gol direita"></div>
+                <div id="campo-jogadores"></div>
+
+            </div>
+            <div id="canvas">
+            </div>
+        </div>
+        <div class="actions">
+            <button class="action" data-action="adicionar">Adicionar</button>
+            <button class="action" data-action="remover">Remover</button>
+            <button class="action" data-action="alterarPosicao">Alterar Posição</button>
+            <button class="action" data-action="alterarNome">Alterar Nome</button>
+            <!-- Filtrar não está funcional ainda -->
+            <button class="action" data-action="filtrar">Filtrar</button>
+            <!-- Talvez tirar esse button de "mostrar escalação" daqui e colocar como função a parte -->
+            <button class="action" data-action="mostrarEscalacao">Mostrar Escalaçao</button>
+            <button class="action" data-action="reset">Resetar</button>
+        </div>
+    </div>
+
+    <form id="forms">
+    </form>
+
+</body>
+<script type="module" src="lib.js"></script>
+<script type="module" src="ui.js"></script>
+
+</html>
