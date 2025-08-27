@@ -13,16 +13,16 @@ function clearData() {
     localStorage.removeItem(DATA_KEY);
 }
 
-function removeDataByName(name) {
+function removePlayerByName(name) {
     const dados = getData();
     saveData(dados.filter(i => i.nome !== name));
 }
 
-function alterData(nome, newItem) {
+function alterPlayerByName(nome, newItem) {
     const dados = getData();
     saveData(dados.map(i => i.nome === nome ? newItem : i));
 }
 
-const Lib = { saveData, getData, clearData, removeDataByName, alterData };
+const Lib = { saveData, getData, clearData, removePlayerByName, alterPlayerByName };
 
 export default Lib;
