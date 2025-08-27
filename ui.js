@@ -123,7 +123,6 @@ const actions = {
             //Coleta de dados
             const formData = new FormData(form);
             const nome = formData.get("nome");
-
             //Remoção do jogador
             removeJogador(nome);
         });
@@ -217,13 +216,13 @@ const actions = {
                     <p>${jogador.nome}</p>
                     <p style="font-size: 12px; color: gray;">${jogador.posicao}</p>
                 </div>
-                <button style="cursor: pointer; color: red; background: none; border: none;" data-action="remove-jogador">x</button>
+                <button style="cursor: pointer; color: red; background: none; border: none;">x</button>
                 `;
 
             // Adiciona evento de remoção
-            const $button = div.querySelector("[data-action='remove-jogador']");
+            const $button = div.querySelector(".jogador button");
             $button.addEventListener("click", () => {
-                removeJogador(jogador);
+                removeJogador(jogador.nome);
             });
 
             // Adiciona o jogador ao canvas
@@ -261,10 +260,10 @@ function addJogador({ nome, posicao }) {
 }
 function removeJogador(nome) {
     // remove do localStorage
-    Lib.removeDataByName(nome);
+    Lib.removePlayerByName(nome);
 
     // remove o node element
-    const $jogadorRemovido = document.getElementById(`[data-jogador=${nome}]`);
+    const $jogadorRemovido = document.querySelector(`[data-jogador="${nome}"]`);
     $jogadorRemovido.remove();
 
     //exibe a escalação atualizada
@@ -282,10 +281,10 @@ function alterarPosicaoJogador(nome, novaPosicao) {
     if (jogadores.find(j => j.posicao === novaPosicao)) return alert("Já existe um jogador nessa posição!");
 
     const novoItem = { nome: jogador.nome, posicao: novaPosicao };
-    Lib.alterData(nome, novoItem);
+    Lib.alterPlayerByName(nome, novoItem);
 
     // Atualiza o jogador no campo
-    const $jogadorElemento = document.getElementById(`[data-jogador=${nome}]`);
+    const $jogadorElemento = document.querySelector(`[data-jogador="${nome}"]`);
     if ($jogadorElemento) {
         $jogadorElemento.style = `${posicoes[novaPosicao]}; display: flex; justify-content: center; align-items: center; flex-direction: column; z-index: 10;`;
     }
@@ -302,10 +301,10 @@ function alterarNomeJogador(nome, novoNome) {
     if (jogadores.find(j => j.nome === novoNome)) return alert("Já existe um jogador com esse nome!");
 
     const novoItem = { nome: novoNome, posicao: jogador.posicao };
-    Lib.alterData(nome, novoItem);
+    Lib.alterPlayerByName(nome, novoItem);
 
     // Atualiza o jogador no campo
-    const $jogadorElemento = document.getElementById(`[data-jogador=${nome}]`);
+    const $jogadorElemento = document.querySelector(`[data-jogador="${nome}"]`);
     if ($jogadorElemento) {
         $jogadorElemento.dataset.jogador = `${novoNome}`;
         $jogadorElemento.querySelector("p").textContent = novoNome;
@@ -330,4 +329,5 @@ Lib.getData().forEach(jogador => addJogador({ nome: jogador.nome, posicao: jogad
 
 
 // Fazer funções auxiliares
-// para usar recursividade ao inves de loops e métodos de array: jogadores.find(jogador => jogador.nome === nome) e jogadores.find(jogador => jogador.posicao === posicao);
+// criar recursividade de: jogadores.find(jogador => jogador.nome === nome) e jogadores.find(jogador => jogador.posicao === posicao);
+// fazer uma função que filtra os jogadores por posição
