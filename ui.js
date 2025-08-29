@@ -6,12 +6,13 @@ const form = document.getElementById("forms");
 const botoes = document.querySelectorAll("[data-action]");
 const $jogadoresEscalados = document.getElementById("total-jogadores");
 const $limiteJogadores = document.getElementById("limite-jogadores");
+const $botaoTrocaTime = document.getElementById("troca-time");
 
 // Define as posições dos jogadores
 const posicoes = {
     GOL: "grid-column: 1; grid-row: 4/6;",
-    LE: "grid-column: 2; grid-row: 2/3;",
-    LD: "grid-column: 2; grid-row: 7/8;",
+    LE: "grid-column: 2/4; grid-row: 2/3;",
+    LD: "grid-column: 2/4; grid-row: 7/8;",
 
     ZAGE: "grid-column: 2; grid-row: 3/5;",
     ZAG: "grid-column: 2; grid-row: 4/6;",
@@ -49,11 +50,14 @@ const actions = {
         // Verifica se o limite de jogadores foi atingido
         if (Number($limiteJogadores.value) <= Number($jogadoresEscalados.innerText)) return alert("Limite de jogadores atingido!");
 
+        //Exibe o Formulario
+        form.classList.add("show");
+
         // Criação do formulário
         form.innerHTML = `
         <li class="field">
             <label for="nome">Nome do Jogador:</label>
-            <input type="text" name="nome" placeholder="Nome do Jogador" required>
+            <input type="text" name="nome" placeholder="Nome do Jogador" required max="15">
         </li>
         <li class="field">
             <label for="posicao">Posição do Jogador:</label>
@@ -70,7 +74,11 @@ const actions = {
                 <option value="MCE">Meio campo esquerdo</option>
                 <option value="MCD">Meio campo direito</option>
                 <option value="MC">Meio campo</option>
-
+                
+                <option value="VOLE">Volante esquerdo</option>
+                <option value="VOLD">Voltante direito</option>
+                <option value="VOL">Volante</option>
+                
                 <option value="LD">Lateral Direito</option>
                 <option value="LE">Lateral Esquerdo</option>
                 <option value="ZAG">Zagueiro central</option>
@@ -103,9 +111,15 @@ const actions = {
             jogadores.push({ nome, posicao });
             Lib.saveData(jogadores);
             addJogador({ nome, posicao });
+
+            //Esconde o formulario
+            form.classList.remove("show");
         });
     },
     remover: () => {
+        //Exibe o Formulario
+        form.classList.add("show");
+
         //Criação do formulário
         form.innerHTML = `
             <li class="field">
@@ -123,12 +137,19 @@ const actions = {
             //Coleta de dados
             const formData = new FormData(form);
             const nome = formData.get("nome");
+
             //Remoção do jogador
             removeJogador(nome);
+
+            //Esconde o formulario
+            form.classList.remove("show");
         });
         form.appendChild(submit);
     },
     alterarPosicao: () => {
+        //Exibe o Formulario
+        form.classList.add("show");
+
         form.innerHTML = `
             <li class="field">
                 <label for="nome">Nome do Jogador:</label>
@@ -172,9 +193,15 @@ const actions = {
 
             //Altera a posição do jogador
             alterarPosicaoJogador(nome, posicao);
+
+            //Esconde o formulario
+            form.classList.remove("show");
         });
     },
     alterarNome: () => {
+        //Exibe o Formulario
+        form.classList.add("show");
+
         form.innerHTML = `
             <li class="field">
                 <label for="nome">Nome do Jogador:</label>
@@ -197,6 +224,9 @@ const actions = {
 
             //Altera o nome do jogador
             alterarNomeJogador(nome, novoNome);
+
+            //Esconde o formulario
+            form.classList.remove("show");
         });
     },
     filtrar: () => {
@@ -214,9 +244,9 @@ const actions = {
             div.innerHTML = `
                 <div class="jogador-info">
                     <p>${jogador.nome}</p>
-                    <p style="font-size: 12px; color: gray;">${jogador.posicao}</p>
+                    <p style="font-size: 12px; padding: 5px; border-radius: 5px; background-color: #1A2E24;">${jogador.posicao}</p>
                 </div>
-                <button style="cursor: pointer; color: red; background: none; border: none;">x</button>
+                <button style="cursor: pointer; color: #ea7f41ff; background: none; border: none;">x</button>
                 `;
 
             // Adiciona evento de remoção
@@ -229,7 +259,9 @@ const actions = {
             canvas.appendChild(div);
         });
     },
-
+    mostrarEstatisticas: () => {
+        console.log("Mostrar estatísticas");
+    },
     importar: () => {
         console.log("Importar jogadores");
     },
@@ -240,6 +272,7 @@ const actions = {
         Lib.clearData();
         canvas.innerHTML = "";
         campoJogadoresElemento.innerHTML = "";
+        $jogadoresEscalados.textContent = "0";
     }
 }
 
@@ -249,7 +282,7 @@ function addJogador({ nome, posicao }) {
         <div
             style="${posicoes[posicao]}; display: flex; justify-content: center; align-items: center; flex-direction: column; z-index: 10;" data-jogador="${nome}">
             <img src="img/jogador-de-futebol.png" alt="${nome}" style="width: 30px; height: auto;">
-            <p>${nome}</p>
+            <p style="text-align: center; font-size: 16px;">${nome}</p>
         </div>
         `;
     //atualiza contador de jogadores escalados
@@ -328,6 +361,21 @@ Lib.getData().forEach(jogador => addJogador({ nome: jogador.nome, posicao: jogad
  */}
 
 
-// Fazer funções auxiliares
+// Fazer funções novas
+// -> guardar estatisticas de jogo (asistencias, gols, cartões)
+//    -> mudar como o objeto
+//    -> funçao pra mostrar as estatisticas
+
+const jogador = {
+    nome: '',
+    posicao: '',
+    estatisticas: {
+        assistencias: 0,
+        gols: 0,
+        cartoes: 0
+    },
+    time: 'azul',
+    escalado: false
+}
 // criar recursividade de: jogadores.find(jogador => jogador.nome === nome) e jogadores.find(jogador => jogador.posicao === posicao);
 // fazer uma função que filtra os jogadores por posição

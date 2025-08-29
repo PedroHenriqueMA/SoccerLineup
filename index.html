@@ -14,24 +14,27 @@
 
 <body>
     <div style="display: flex; gap: 10px; justify-content: space-between; align-items: center;">
-        <h1>
+        <h1 style="cursor: default;">
             Escale seu time
             <br>
             da pelada
-            <img src="img/sports_and_outdoors_48dp_000000_FILL0_wght400_GRAD0_opsz48.png" alt="bola de futebol"
+            <img src="img/sports_and_outdoors_48dp_CCC_FILL0_wght400_GRAD0_opsz48.png" alt="bola de futebol"
                 style="width: 24px; height: 24px;">
         </h1>
 
         <!-- Detalhes e configurações -->
         <div class="configs">
-            <div>
-                <label for="jogadores">Limite de jogadores:</label>
+            <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 5px;">
+                <label for="jogadores" style="display: flex; gap: 5px; align-items: center;">
+                    <img src="img/time-de-futebol.png" alt="" style="width: 24px;">
+                    Limite de jogadores:
+                </label>
                 <input type="number" id="limite-jogadores" name="jogadores" min="1" max="11">
             </div>
             <div style="display: flex; gap: 5px; align-items: center;">
                 <p style="display: flex; align-items: center;"><img style="width: 24px; height: 24px;"
                         src="img/jogador-de-futebol.png">Total jogadores escalados:</p>
-                <span id="total-jogadores"></span>
+                <span id="total-jogadores">0</span>
             </div>
         </div>
     </div>
@@ -45,6 +48,13 @@
                 <div class="linha-centro"></div>
                 <div class="area-gol esquerda"></div>
                 <div class="area-gol direita"></div>
+                <div class="area-gol-maior esquerda"></div>
+                <div class="area-gol-maior direita"></div>
+                <div class="semi-circulo semi-circulo-esquerdo "></div>
+                <div class="semi-circulo semi-circulo-direito "></div>
+                <div class="ponto ponto-centro"></div>
+                <div class="ponto ponto-esquerda"></div>
+                <div class="ponto ponto-direita"></div>
                 <div id="campo-jogadores"></div>
 
             </div>
@@ -60,11 +70,13 @@
             <button class="action" data-action="filtrar">Filtrar</button>
             <!-- Talvez tirar esse button de "mostrar escalação" daqui e colocar como função a parte -->
             <button class="action" data-action="mostrarEscalacao">Mostrar Escalaçao</button>
+            <button class="action" data-action="mostrarEstatisticas">Mostrar Estatisticas</button>
             <button class="action" data-action="reset">Resetar</button>
         </div>
     </div>
 
-    <form id="forms">
+    <form id="forms" class="hidden">
+        <!-- Formulários são inseridos aqui via JavaScript -->
     </form>
 
 </body>
