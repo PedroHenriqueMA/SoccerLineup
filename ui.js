@@ -67,31 +67,26 @@ const actions = {
                 <option value="CAD">Centroavante direito</option>
                 <option value="PD">Ponta direita</option>
                 <option value="PE">Ponta esquerda</option>
-
                 <option value="MEI">Meia atacante</option>
                 <option value="ME">Meio esquerdo</option>
                 <option value="MD">Meio Direito</option>
                 <option value="MCE">Meio campo esquerdo</option>
                 <option value="MCD">Meio campo direito</option>
                 <option value="MC">Meio campo</option>
-                
                 <option value="VOLE">Volante esquerdo</option>
                 <option value="VOLD">Voltante direito</option>
                 <option value="VOL">Volante</option>
-                
                 <option value="LD">Lateral Direito</option>
                 <option value="LE">Lateral Esquerdo</option>
                 <option value="ZAG">Zagueiro central</option>
                 <option value="ZAGE">Zagueiro esquerdo</option>
                 <option value="ZAGD">Zagueiro direito</option>
-
                 <option value="GOL">Goleiro</option>
             </select>
-
         </li>
         <button style="background-color: #4CAF50;" data-action="submit" class="submit" type="submit">Adicionar Jogador</button>
         `
-        //adicionando submissão
+        //Adicionando submissão
         const submit = form.querySelector("[data-action='submit']");
         submit.addEventListener("click", (event) => {
             event.preventDefault();
@@ -102,17 +97,24 @@ const actions = {
             const nome = formData.get("nome");
             const posicao = formData.get("posicao");
 
-            //Etapas de verificação -> talvez mudar para tirar esse método find
+            //Etapas de verificação
             if (nome === "") return alert("Nome do jogador é obrigatório!");
-            if (jogadores.find(j => j.nome === nome)) return alert("Jogador já escalado!");
-            if (jogadores.find(j => j.posicao === posicao)) return alert("Jogador já escalado nessa posição!");
+            if (Lib.findPlayerByName(nome)) return alert("Jogador já escalado!");
+            if (Lib.findPlayerByPosition(posicao)) return alert("Jogador já escalado nessa posição!");
 
-            //Adição do jogador
-            jogadores.push({ nome, posicao });
+            // Novo objeto de jogador com estatísticas
+            const novoJogador = {
+                nome,
+                posicao,
+                estatisticas: { assistencias: 0, gols: 0, cartoes: 0 },
+                time: 'azul', // ou 'vermelho'
+                escalado: true
+            };
+
+            // Adiciona o novo jogador
+            jogadores.push(novoJogador);
             Lib.saveData(jogadores);
-            addJogador({ nome, posicao });
-
-            //Esconde o formulario
+            adicionaJogadorAoCampo(novoJogador);
             form.classList.remove("show");
         });
     },
@@ -144,12 +146,10 @@ const actions = {
             //Esconde o formulario
             form.classList.remove("show");
         });
-        form.appendChild(submit);
     },
     alterarPosicao: () => {
         //Exibe o Formulario
         form.classList.add("show");
-
         form.innerHTML = `
             <li class="field">
                 <label for="nome">Nome do Jogador:</label>
@@ -158,30 +158,27 @@ const actions = {
             <li class="field">
                 <label for="posicao">Nova posição do Jogador:</label>
                 <select name="posicao" id="posicao">
-                <option value="CA">Centroavante</option>
-                <option value="CAE">Centroavante esquerdo</option>
-                <option value="CAD">Centroavante direito</option>
-                <option value="PD">Ponta direita</option>
-                <option value="PE">Ponta esquerda</option>
-
-                <option value="MEI">Meia atacante</option>
-                <option value="ME">Meio esquerdo</option>
-                <option value="MD">Meio Direito</option>
-                <option value="MCE">Meio campo esquerdo</option>
-                <option value="MCD">Meio campo direito</option>
-                <option value="MC">Meio campo</option>
-
-                <option value="LD">Lateral Direito</option>
-                <option value="LE">Lateral Esquerdo</option>
-                <option value="ZAG">Zagueiro central</option>
-                <option value="ZAGE">Zagueiro esquerdo</option>
-                <option value="ZAGD">Zagueiro direito</option>
-
-                <option value="GOL">Goleiro</option>
-            </select>
+                    <option value="CA">Centroavante</option>
+                    <option value="CAE">Centroavante esquerdo</option>
+                    <option value="CAD">Centroavante direito</option>
+                    <option value="PD">Ponta direita</option>
+                    <option value="PE">Ponta esquerda</option>
+                    <option value="MEI">Meia atacante</option>
+                    <option value="ME">Meio esquerdo</option>
+                    <option value="MD">Meio Direito</option>
+                    <option value="MCE">Meio campo esquerdo</option>
+                    <option value="MCD">Meio campo direito</option>
+                    <option value="MC">Meio campo</option>
+                    <option value="LD">Lateral Direito</option>
+                    <option value="LE">Lateral Esquerdo</option>
+                    <option value="ZAG">Zagueiro central</option>
+                    <option value="ZAGE">Zagueiro esquerdo</option>
+                    <option value="ZAGD">Zagueiro direito</option>
+                    <option value="GOL">Goleiro</option>
+                </select>
             </li>
             <button style="background-color: #ffa72cff;" data-action="submit" class="submit" type="submit">Alterar Jogador</button>
-        `
+        `;
         const submit = form.querySelector("[data-action='submit']");
         submit.addEventListener("click", (event) => {
             event.preventDefault();
@@ -201,7 +198,6 @@ const actions = {
     alterarNome: () => {
         //Exibe o Formulario
         form.classList.add("show");
-
         form.innerHTML = `
             <li class="field">
                 <label for="nome">Nome do Jogador:</label>
@@ -212,7 +208,7 @@ const actions = {
                 <input type="text" name="novo-nome" placeholder="Novo nome do Jogador" required>
             </li>
             <button style="background-color: #ffa72cff;" data-action="submit" class="submit" type="submit">Alterar Jogador</button>
-        `
+        `;
         const submit = form.querySelector("[data-action='submit']");
         submit.addEventListener("click", (event) => {
             event.preventDefault();
@@ -230,9 +226,56 @@ const actions = {
         });
     },
     filtrar: () => {
-        console.log("Filtrar jogadores");
+        // mostra o formulario
+        form.classList.add("show");
+        form.innerHTML = `
+            <li class="field">
+                <label for="posicao">Posição do Jogador:</label>
+                <select name="posicao" id="posicao">
+                    <option value="TODAS">Todas</option>
+                    <option value="CA">Centroavante</option>
+                    <option value="CAE">Centroavante esquerdo</option>
+                    <option value="CAD">Centroavante direito</option>
+                    <option value="PD">Ponta direita</option>
+                    <option value="PE">Ponta esquerda</option>
+                    <option value="MEI">Meia atacante</option>
+                    <option value="ME">Meio esquerdo</option>
+                    <option value="MD">Meio Direito</option>
+                    <option value="MCE">Meio campo esquerdo</option>
+                    <option value="MCD">Meio campo direito</option>
+                    <option value="MC">Meio campo</option>
+                    <option value="VOLE">Volante esquerdo</option>
+                    <option value="VOLD">Voltante direito</option>
+                    <option value="VOL">Volante</option>
+                    <option value="LD">Lateral Direito</option>
+                    <option value="LE">Lateral Esquerdo</option>
+                    <option value="ZAG">Zagueiro central</option>
+                    <option value="ZAGE">Zagueiro esquerdo</option>
+                    <option value="ZAGD">Zagueiro direito</option>
+                    <option value="GOL">Goleiro</option>
+                </select>
+            </li>
+            <button style="background-color: #4CAF50;" data-action="submit" class="submit" type="submit">Filtrar</button>
+        `;
+        // Submissao de Filtro
+        const submit = form.querySelector("[data-action='submit']");
+        submit.addEventListener("click", (event) => {
+            event.preventDefault();
+            // coleta dados
+            const formData = new FormData(form);
+            const posicao = formData.get("posicao");
+
+            // Filtra jogadores por posição
+            if (posicao === "TODAS") {
+                actions.mostrarEscalacao();
+            } else {
+                const jogadoresFiltrados = Lib.getData().filter(j => j.posicao === posicao);
+                mostrarJogadoresFiltrados(jogadoresFiltrados);
+            }
+            // esconde o fomulario
+            form.classList.remove("show");
+        });
     },
-    // pensando em tirar essa action daqui e colocar como função a parte
     mostrarEscalacao: () => {
         // Limpa o canvas
         canvas.innerHTML = "";
@@ -251,22 +294,69 @@ const actions = {
 
             // Adiciona evento de remoção
             const $button = div.querySelector(".jogador button");
-            $button.addEventListener("click", () => {
-                removeJogador(jogador.nome);
-            });
-
-            // Adiciona o jogador ao canvas
+            $button.addEventListener("click", () => removeJogador(jogador.nome));
             canvas.appendChild(div);
         });
     },
     mostrarEstatisticas: () => {
-        console.log("Mostrar estatísticas");
+        canvas.innerHTML = "";
+        Lib.getData().forEach(jogador => {
+            const div = document.createElement("div");
+            div.className = "jogador";
+            div.innerHTML = `
+                <div class="jogador-info">
+                    <p>${jogador.nome}</p>
+                    <p style="font-size: 12px; padding: 5px; border-radius: 5px; background-color: #1A2E24;">
+                        Gols: ${jogador.estatisticas.gols} | Assist.: ${jogador.estatisticas.assistencias} | Cartões: ${jogador.estatisticas.cartoes}
+                    </p>
+                </div>
+                <button style="cursor: pointer; color: #ea7f41ff; background: none; border: none;">x</button>
+            `;
+            canvas.appendChild(div);
+        });
     },
-    importar: () => {
-        console.log("Importar jogadores");
-    },
-    exportar: () => {
-        console.log("Exportar jogadores");
+    atualizarEstatisticas: () => {
+        form.classList.add("show");
+        form.innerHTML = `
+            <li class="field">
+                <label for="nome">Nome do Jogador:</label>
+                <input type="text" name="nome" placeholder="Nome do Jogador" required>
+            </li>
+            <li class="field">
+                <label for="gols">Gols:</label>
+                <input type="number" name="gols" min="0" value="0">
+            </li>
+            <li class="field">
+                <label for="assistencias">Assistências:</label>
+                <input type="number" name="assistencias" min="0" value="0">
+            </li>
+            <li class="field">
+                <label for="cartoes">Cartões:</label>
+                <input type="number" name="cartoes" min="0" value="0">
+            </li>
+            <button style="background-color: #4CAF50;" data-action="submit" class="submit" type="submit">Atualizar</button>
+        `;
+        // Adiciona evento de submit
+        const submit = form.querySelector("[data-action='submit']");
+        submit.addEventListener("click", (event) => {
+            event.preventDefault();
+            //coleta dados do formulario
+            const formData = new FormData(form);
+            const nome = formData.get("nome");
+            const jogador = Lib.findPlayerByName(nome);
+
+            // Verifica se o jogador existe
+            if (!jogador) return alert("Jogador não encontrado!");
+
+            // Atualiza estatísticas
+            jogador.estatisticas.gols += Number(formData.get("gols"));
+            jogador.estatisticas.assistencias += Number(formData.get("assistencias"));
+            jogador.estatisticas.cartoes += Number(formData.get("cartoes"));
+
+            Lib.alterPlayerByName(nome, jogador);
+            actions.mostrarEstatisticas(); // Atualiza a exibição
+            form.classList.remove("show");
+        });
     },
     reset: () => {
         Lib.clearData();
@@ -276,8 +366,7 @@ const actions = {
     }
 }
 
-function addJogador({ nome, posicao }) {
-    //adiciona jogador ao campo
+function adicionaJogadorAoCampo({ nome, posicao }) {
     campoJogadoresElemento.innerHTML += `
         <div
             style="${posicoes[posicao]}; display: flex; justify-content: center; align-items: center; flex-direction: column; z-index: 10;" data-jogador="${nome}">
@@ -291,15 +380,15 @@ function addJogador({ nome, posicao }) {
     //exibe escalação
     actions.mostrarEscalacao();
 }
+
 function removeJogador(nome) {
     // remove do localStorage
     Lib.removePlayerByName(nome);
 
-    // remove o node element
+    // remove o node element se o jogador existir
     const $jogadorRemovido = document.querySelector(`[data-jogador="${nome}"]`);
+    if (!$jogadorRemovido) return;
     $jogadorRemovido.remove();
-
-    //exibe a escalação atualizada
     actions.mostrarEscalacao();
 
     // atualiza o contador de jogadores escalados
@@ -307,75 +396,53 @@ function removeJogador(nome) {
 }
 
 function alterarPosicaoJogador(nome, novaPosicao) {
-    const jogadores = Lib.getData();
-    const jogador = jogadores.find(j => j.nome === nome);
-
+    const jogador = Lib.findPlayerByName(nome);
     if (!jogador) return alert("Jogador não encontrado!");
-    if (jogadores.find(j => j.posicao === novaPosicao)) return alert("Já existe um jogador nessa posição!");
+    if (Lib.findPlayerByPosition(novaPosicao)) return alert("Já existe um jogador nessa posição!");
 
-    const novoItem = { nome: jogador.nome, posicao: novaPosicao };
+    const novoItem = { ...jogador, posicao: novaPosicao };
     Lib.alterPlayerByName(nome, novoItem);
 
-    // Atualiza o jogador no campo
     const $jogadorElemento = document.querySelector(`[data-jogador="${nome}"]`);
     if ($jogadorElemento) {
         $jogadorElemento.style = `${posicoes[novaPosicao]}; display: flex; justify-content: center; align-items: center; flex-direction: column; z-index: 10;`;
     }
-
-    // Exibe a escalação atualizada
     actions.mostrarEscalacao();
 }
 
 function alterarNomeJogador(nome, novoNome) {
-    const jogadores = Lib.getData();
-    const jogador = jogadores.find(j => j.nome === nome);
-
+    const jogador = Lib.findPlayerByName(nome);
     if (!jogador) return alert("Jogador não encontrado!");
-    if (jogadores.find(j => j.nome === novoNome)) return alert("Já existe um jogador com esse nome!");
+    if (Lib.findPlayerByName(novoNome)) return alert("Já existe um jogador com esse nome!");
 
-    const novoItem = { nome: novoNome, posicao: jogador.posicao };
+    const novoItem = { ...jogador, nome: novoNome };
     Lib.alterPlayerByName(nome, novoItem);
 
-    // Atualiza o jogador no campo
     const $jogadorElemento = document.querySelector(`[data-jogador="${nome}"]`);
     if ($jogadorElemento) {
-        $jogadorElemento.dataset.jogador = `${novoNome}`;
+        $jogadorElemento.dataset.jogador = novoNome;
         $jogadorElemento.querySelector("p").textContent = novoNome;
     }
-
-    // Exibe a escalação atualizada
     actions.mostrarEscalacao();
 }
 
-// Carrega os jogadores salvos no localStorage ao iniciar a página
-Lib.getData().forEach(jogador => addJogador({ nome: jogador.nome, posicao: jogador.posicao }));
-
-
-{/* 
-    <div                POSICAO
-        style="(grid-column: 1; grid-row: 4/6); display: flex; justify-content: center; align-items: center; flex-direction: column;">
-        <img src="assets/img/jogador-de-futebol.png" alt="fulano" style="width: 30px; height: auto;">
-        <p>fulano</p>                                  NOME
-            NOME
-    </div> 
- */}
-
-
-// Fazer funções novas
-// -> guardar estatisticas de jogo (asistencias, gols, cartões)
-//    -> mudar como o objeto
-//    -> funçao pra mostrar as estatisticas
-
-const jogador = {
-    nome: '',
-    posicao: '',
-    estatisticas: {
-        assistencias: 0,
-        gols: 0,
-        cartoes: 0
-    },
-    time: 'azul',
-    escalado: false
+function mostrarJogadoresFiltrados(jogadores) {
+    canvas.innerHTML = "";
+    jogadores.forEach(jogador => {
+        const div = document.createElement("div");
+        div.className = "jogador";
+        div.innerHTML = `
+            <div class="jogador-info">
+                <p>${jogador.nome}</p>
+                <p style="font-size: 12px; padding: 5px; border-radius: 5px; background-color: #1A2E24;">${jogador.posicao}</p>
+            </div>
+            <button style="cursor: pointer; color: #ea7f41ff; background: none; border: none;">x</button>
+        `;
+        const $button = div.querySelector(".jogador button");
+        $button.addEventListener("click", () => removeJogador(jogador.nome));
+        canvas.appendChild(div);
+    });
 }
-// criar recursividade de: jogadores.find(jogador => jogador.nome === nome) e jogadores.find(jogador => jogador.posicao === posicao);
-// fazer uma função que filtra os jogadores por posição
+
+// Carrega os jogadores salvos no localStorage ao iniciar a página
+Lib.getData().forEach(jogador => adicionaJogadorAoCampo(jogador));

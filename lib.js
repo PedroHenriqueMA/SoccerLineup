@@ -23,6 +23,14 @@ function alterPlayerByName(nome, newItem) {
     saveData(dados.map(i => i.nome === nome ? newItem : i));
 }
 
-const Lib = { saveData, getData, clearData, removePlayerByName, alterPlayerByName };
+function findPlayerByName(name) {
+    return getData().find(i => i.nome === name);
+}
+
+function findPlayerByPosition(position) {
+    return getData().find(jogador => jogador.posicao === position);
+}
+
+const Lib = { saveData, getData, clearData, removePlayerByName, alterPlayerByName, findPlayerByName, findPlayerByPosition };
 
 export default Lib;
