@@ -13,37 +13,56 @@ function clearData() {
     localStorage.removeItem(DATA_KEY);
 }
 
-function removePlayerByName(name) {
-    const dados = getData();
-    saveData(dados.filter(i => i.nome !== name));
+function removerJogadorPorNome(name) {
+    saveData(getData().filter(i => i.nome !== name));
 }
 
-function alterPlayerByName(nome, newItem) {
-    const dados = getData();
-    saveData(dados.map(i => i.nome === nome ? newItem : i));
+function alterarJogadorPorNome(name, newItem) {
+    saveData(getData().map(i => i.nome === name ? newItem : i));
 }
 
-function findPlayerByName(name) {
-    return getData().find(i => i.nome === name);
+function buscaJogadorPorNome(name) {
+    return findRecursivo(getData(), i => i.nome === name);
 }
 
-function findPlayerByPosition(position) {
-    return getData().find(jogador => jogador.posicao === position);
+function buscaJogadorPorPosicao(position) {
+    return findRecursivo(getData(), jogador => jogador.posicao === position);
 }
 
-function findPlayerByPositionAndTeam(position, time) {
-    return getData().find(jogador => jogador.posicao === position && jogador.time === time);
+function buscaJogadorPorPosicaoETime(position, time) {
+    return findRecursivo(getData(), jogador => jogador.posicao === position && jogador.time === time);
+}
+
+function filtrarJogadoresPorPosicao(posicao) {
+    return getData().filter(j => j.posicao === posicao);
+}
+
+function findRecursivo(array, callback, indice = 0) {
+ 
+  if (indice >= array.length) {
+    return undefined; 
+  }
+
+  const elementoAtual = array[indice];
+
+ 
+  if (callback(elementoAtual, indice, array)) {
+    return elementoAtual;
+  }
+
+  return findRecursivo(array, callback, indice + 1);
 }
 
 const Lib = {
     saveData,
     getData,
     clearData,
-    removePlayerByName,
-    alterPlayerByName,
-    findPlayerByName,
-    findPlayerByPosition,
-    findPlayerByPositionAndTeam
+    removerJogadorPorNome,
+    alterarJogadorPorNome,
+    buscaJogadorPorNome,
+    buscaJogadorPorPosicao,
+    buscaJogadorPorPosicaoETime,
+    filtrarJogadoresPorPosicao
 };
 
 export default Lib;

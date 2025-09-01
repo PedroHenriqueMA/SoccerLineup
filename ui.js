@@ -1,9 +1,9 @@
 import Lib from "./lib.js";
 
-const campoJogadoresElemento = document.getElementById("campo-jogadores");
-const canvas = document.getElementById("canvas");
+const $campoJogadores = document.getElementById("campo-jogadores");
+const $canvas = document.getElementById("canvas");
 const form = document.getElementById("forms");
-const botoes = document.querySelectorAll("[data-action]");
+const $botoes = document.querySelectorAll("[data-action]");
 const $jogadoresEscalados = document.getElementById("total-jogadores");
 const $limiteJogadores = document.getElementById("limite-jogadores");
 const $botaoTrocaTimeAtivo = document.getElementById("troca-time");
@@ -38,7 +38,7 @@ const posicoes = {
 }
 
 // Adiciona eventos aos botões
-botoes.forEach(botao => {
+$botoes.forEach(botao => {
     botao.addEventListener("click", () => {
         const acao = botao.dataset.action;
         actions[acao]();
@@ -51,14 +51,14 @@ $botaoTrocaTimeAtivo.addEventListener("click", () => {
 
     // mostra e adiciona os jogadores no campo
     actions.mostrarEscalacao();
-    campoJogadoresElemento.innerHTML = "";
+    $campoJogadores.innerHTML = "";
     Lib.getData().forEach(jogador => {
         if (jogador.time !== $timeAtivo.value) return; // Mostra apenas jogadores do time ativo
         adicionaJogadorAoCampo(jogador);
     });
 
     // Exibe marcação do time ativo
-    campoJogadoresElemento.style.borderColor = $timeAtivo.value === "azul" ? "#008080" : "#3D0000";
+    $campoJogadores.style.borderColor = $timeAtivo.value === "azul" ? "#008080" : "#3D0000";
 
     // Marca o número de jogadores escalados
     $jogadoresEscalados.textContent = Lib.getData().filter(j => j.time === $timeAtivo.value).length;
@@ -119,9 +119,9 @@ const actions = {
 
             //Etapas de verificação
             if (nome === "") return alert("Nome do jogador é obrigatório!");
-            if (Lib.findPlayerByName(nome)) return alert("Jogador já existe!");
+            if (Lib.buscaJogadorPorNome(nome)) return alert("Jogador já existe!");
 
-            if (Lib.findPlayerByPositionAndTeam(posicao, $timeAtivo.value)) return alert("Jogador já escalado nessa posição!");
+            if (Lib.buscaJogadorPorPosicaoETime(posicao, $timeAtivo.value)) return alert("Jogador já escalado nessa posição!");
             // Novo objeto de jogador com estatísticas
             const novoJogador = {
                 nome,
@@ -287,10 +287,12 @@ const actions = {
 
             // Filtra jogadores por posição
             if (posicao === "TODAS") {
-                mostrarJogadoresFiltrados(Lib.getData());
+                $canvas.innerHTML = "";
+                Lib.getData().forEach(jogador => exibeJogadorComEstatisticas(jogador));
             } else {
-                const jogadoresFiltrados = Lib.getData().filter(j => j.posicao === posicao);
-                mostrarJogadoresFiltrados(jogadoresFiltrados);
+                $canvas.innerHTML = "";
+                const jogadoresFiltrados = Lib.filtrarJogadoresPorPosicao(posicao)
+                jogadoresFiltrados.forEach(jogador => exibeJogadorComEstatisticas(jogador));
             }
             // esconde o fomulario
             form.classList.remove("show");
@@ -298,45 +300,21 @@ const actions = {
     },
     mostrarEscalacao: () => {
         // Limpa o canvas
-        canvas.innerHTML = "";
+        $canvas.innerHTML = "";
 
         // adiciona cada um dos jogadores ao canvas
         Lib.getData().forEach(jogador => {
-
             if (jogador.time !== $timeAtivo.value) return; // Mostra apenas jogadores do time ativo
-
-            const div = document.createElement("div");
-            div.className = "jogador";
-            div.innerHTML = `
-                <div class="jogador-info">
-                    <p>${jogador.nome}</p>
-                    <p style="font-size: 12px; padding: 5px; border-radius: 5px; background-color: #1A2E24;">${jogador.posicao}</p>
-                </div>
-                <button style="cursor: pointer; color: #ea7f41ff; background: none; border: none;">x</button>
-                `;
-
-            // Adiciona evento de remoção
-            const $button = div.querySelector(".jogador button");
-            $button.addEventListener("click", () => removeJogador(jogador.nome));
-            canvas.appendChild(div);
+            exibeJogadorSemEstatisticas(jogador);
         });
     },
     mostrarEstatisticas: () => {
-        canvas.innerHTML = "";
+        //Limpa canvas
+        $canvas.innerHTML = "";
+
+        // Adiciona cada jogador com estatísticas
         Lib.getData().forEach(jogador => {
-            const div = document.createElement("div");
-            div.className = "jogador";
-            div.innerHTML = `
-                <div class="jogador-info">
-                    <p>${jogador.nome}</p>
-                    <p style="font-size: 12px; padding: 5px; border-radius: 5px; background-color: #1A2E24;">
-                        Gols: ${jogador.estatisticas.gols} | Assist.: ${jogador.estatisticas.assistencias} | Cartões: ${jogador.estatisticas.cartoes}
-                    </p>
-                    <p style="font-size: 12px; padding: 5px; border-radius: 5px; background-color: ${jogador.time === "azul" ? "#008080" : "#3D0000"}">${jogador.time}</p>
-                </div>
-                <button style="cursor: pointer; color: #ea7f41ff; background: none; border: none;">x</button>
-            `;
-            canvas.appendChild(div);
+            exibeJogadorComEstatisticas(jogador);
         });
     },
     atualizarEstatisticas: () => {
@@ -367,7 +345,7 @@ const actions = {
             //coleta dados do formulario
             const formData = new FormData(form);
             const nome = formData.get("nome");
-            const jogador = Lib.findPlayerByName(nome);
+            const jogador = Lib.buscaJogadorPorNome(nome);
 
             // Verifica se o jogador existe
             if (!jogador) return alert("Jogador não encontrado!");
@@ -377,21 +355,21 @@ const actions = {
             jogador.estatisticas.assistencias += Number(formData.get("assistencias"));
             jogador.estatisticas.cartoes += Number(formData.get("cartoes"));
 
-            Lib.alterPlayerByName(nome, jogador);
-            actions.mostrarEstatisticas(); // Atualiza a exibição
+            Lib.alterarJogadorPorNome(nome, jogador);
+            actions.mostrarEstatisticas();
             form.classList.remove("show");
         });
     },
     reset: () => {
         Lib.clearData();
-        canvas.innerHTML = "";
-        campoJogadoresElemento.innerHTML = "";
+        $canvas.innerHTML = "";
+        $campoJogadores.innerHTML = "";
         $jogadoresEscalados.textContent = "0";
     }
 }
 
 function adicionaJogadorAoCampo({ nome, posicao }) {
-    campoJogadoresElemento.innerHTML += `
+    $campoJogadores.innerHTML += `
         <div
             style="${posicoes[posicao]}; display: flex; justify-content: center; align-items: center; flex-direction: column; z-index: 10;" data-jogador="${nome}">
             <img src="img/jogador-de-futebol.png" alt="${nome}" style="width: 30px; height: auto;">
@@ -407,7 +385,7 @@ function adicionaJogadorAoCampo({ nome, posicao }) {
 
 function removeJogador(nome) {
     // remove do localStorage
-    Lib.removePlayerByName(nome);
+    Lib.removerJogadorPorNome(nome);
 
     // remove o node element se o jogador existir
     const $jogadorRemovido = document.querySelector(`[data-jogador="${nome}"]`);
@@ -421,15 +399,15 @@ function removeJogador(nome) {
 
 function alterarPosicaoJogador(nome, novaPosicao) {
     //Busca jogador
-    const jogador = Lib.findPlayerByName(nome);
+    const jogador = Lib.buscaJogadorPorNome(nome);
 
     //Validações
     if (!jogador) return alert("Jogador não encontrado!");
-    if (Lib.findPlayerByPositionAndTeam(novaPosicao, $timeAtivo.value)) return alert("Já existe um jogador nessa posição!");
+    if (Lib.buscaJogadorPorPosicaoETime(novaPosicao, $timeAtivo.value)) return alert("Já existe um jogador nessa posição!");
 
     //Altera Jogador
     const novoItem = { ...jogador, posicao: novaPosicao };
-    Lib.alterPlayerByName(nome, novoItem);
+    Lib.alterarJogadorPorNome(nome, novoItem);
 
     // Atualiza a exibição
     const $jogadorElemento = document.querySelector(`[data-jogador="${nome}"]`);
@@ -441,15 +419,15 @@ function alterarPosicaoJogador(nome, novaPosicao) {
 
 function alterarNomeJogador(nome, novoNome) {
     //Busca jogador
-    const jogador = Lib.findPlayerByName(nome);
+    const jogador = Lib.buscaJogadorPorNome(nome);
 
     //Validações
     if (!jogador) return alert("Jogador não encontrado!");
-    if (Lib.findPlayerByName(novoNome)) return alert("Já existe um jogador com esse nome!");
+    if (Lib.buscaJogadorPorNome(novoNome)) return alert("Já existe um jogador com esse nome!");
 
     //Altera Jogador
     const novoItem = { ...jogador, nome: novoNome };
-    Lib.alterPlayerByName(nome, novoItem);
+    Lib.alterarJogadorPorNome(nome, novoItem);
 
     // Atualiza a exibição
     const $jogadorElemento = document.querySelector(`[data-jogador="${nome}"]`);
@@ -460,23 +438,52 @@ function alterarNomeJogador(nome, novoNome) {
     actions.mostrarEscalacao();
 }
 
-function mostrarJogadoresFiltrados(jogadores) {
-    canvas.innerHTML = "";
-    jogadores.forEach(jogador => {
-        const div = document.createElement("div");
-        div.className = "jogador";
-        div.innerHTML = `
+
+function exibeJogadorComEstatisticas(jogador) {
+    //Cria o elemento
+    const div = document.createElement("div");
+    div.className = "jogador";
+    div.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: start; gap: 5px;">
             <div class="jogador-info">
-                <p>${jogador.nome}</p>
+                <p style="font-weight: bold;">${jogador.nome}</p>
                 <p style="font-size: 12px; padding: 5px; border-radius: 5px; background-color: #1A2E24;">${jogador.posicao}</p>
                 <p style="font-size: 12px; padding: 5px; border-radius: 5px; background-color: ${jogador.time === "azul" ? "#008080" : "#3D0000"}">${jogador.time}</p>
             </div>
-            <button style="cursor: pointer; color: #ea7f41ff; background: none; border: none;">x</button>
-        `;
-        const $button = div.querySelector(".jogador button");
-        $button.addEventListener("click", () => removeJogador(jogador.nome));
-        canvas.appendChild(div);
-    });
+            <p style="font-size: 12px; padding: 5px; border-radius: 5px; background-color: #1A2E24;">
+                Gols: ${jogador.estatisticas.gols} | Assist.: ${jogador.estatisticas.assistencias} | Cartões: ${jogador.estatisticas.cartoes}
+            </p>
+        </div>
+        <button style="cursor: pointer; color: #ea7f41ff; background: none; border: none;">x</button>
+     `;
+    
+     // Adiciona evento de remoção
+    const $button = div.querySelector(".jogador button");
+    $button.addEventListener("click", () => removeJogador(jogador.nome));
+    $canvas.appendChild(div);
+
+    // Adiciona o elemento ao canvas
+    $canvas.appendChild(div);
+}
+
+function exibeJogadorSemEstatisticas(jogador) {
+    // Cria o elemento
+    const div = document.createElement("div");
+    div.className = "jogador";
+    div.innerHTML = `
+        <div class="jogador-info">
+            <p>${jogador.nome}</p>
+            <p style="font-size: 12px; padding: 5px; border-radius: 5px; background-color: #1A2E24;">${jogador.posicao}</p>
+            <p style="font-size: 12px; padding: 5px; border-radius: 5px; background-color: ${jogador.time === "azul" ? "#008080" : "#3D0000"}">${jogador.time}</p>
+        </div>
+        <button style="cursor: pointer; color: #ea7f41ff; background: none; border: none;">x</button>
+    `;
+    // Adiciona evento de remoção
+    const $button = div.querySelector(".jogador button");
+    $button.addEventListener("click", () => removeJogador(jogador.nome));
+
+    // Adiciona o elemento ao canvas
+    $canvas.appendChild(div);
 }
 
 // Carrega os jogadores salvos no localStorage ao iniciar a página
