@@ -22,7 +22,6 @@
                 style="width: 24px; height: 24px;">
         </h1>
 
-        <!-- Detalhes e configurações -->
         <div class="configs">
             <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 5px;">
                 <label for="jogadores" style="display: flex; gap: 5px; align-items: center;">
@@ -42,7 +41,9 @@
     <div class="main">
 
         <div class="main-show">
-            <button class="troca-time">Trocar Time</button>
+            <button class="troca-time" id="troca-time">Trocar Time</button>
+            <input type="hidden" name="time-ativo" id="time-ativo" value="azul">
+
             <div id="campo">
                 <div class="circulo-central"></div>
                 <div class="linha-centro"></div>
@@ -66,9 +67,7 @@
             <button class="action" data-action="remover">Remover</button>
             <button class="action" data-action="alterarPosicao">Alterar Posição</button>
             <button class="action" data-action="alterarNome">Alterar Nome</button>
-            <!-- Filtrar não está funcional ainda -->
             <button class="action" data-action="filtrar">Filtrar</button>
-            <!-- Talvez tirar esse button de "mostrar escalação" daqui e colocar como função a parte -->
             <button class="action" data-action="mostrarEscalacao">Mostrar Escalaçao</button>
             <button class="action" data-action="mostrarEstatisticas">Mostrar Estatisticas</button>
             <button class="action" data-action="atualizarEstatisticas">Atualizar Estatisticas</button>
@@ -76,9 +75,7 @@
         </div>
     </div>
 
-    <form id="forms" class="hidden">
-        <!-- Formulários são inseridos aqui via JavaScript -->
-    </form>
+    <form id="forms" class="hidden"></form>
 
 </body>
 <script type="module" src="lib.js"></script>

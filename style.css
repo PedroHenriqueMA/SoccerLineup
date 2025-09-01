@@ -107,6 +107,7 @@ button {
     grid-template-columns: repeat(8, calc(100%/8));
     grid-template-rows: repeat(8, calc(100%/8));
     justify-content: center;
+    border-top: 5px solid #008080;
 }
 
 .circulo-central {

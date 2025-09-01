@@ -31,6 +31,19 @@ function findPlayerByPosition(position) {
     return getData().find(jogador => jogador.posicao === position);
 }
 
-const Lib = { saveData, getData, clearData, removePlayerByName, alterPlayerByName, findPlayerByName, findPlayerByPosition };
+function findPlayerByPositionAndTeam(position, time) {
+    return getData().find(jogador => jogador.posicao === position && jogador.time === time);
+}
+
+const Lib = {
+    saveData,
+    getData,
+    clearData,
+    removePlayerByName,
+    alterPlayerByName,
+    findPlayerByName,
+    findPlayerByPosition,
+    findPlayerByPositionAndTeam
+};
 
 export default Lib;
